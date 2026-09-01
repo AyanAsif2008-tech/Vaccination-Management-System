@@ -1,21 +1,33 @@
 <?php
 /**
  * Database Configuration
- * Vaccination Management System - Admin Panel
- *
- * Update the credentials below to match your local MySQL / XAMPP setup.
+ * Vaccination Management System
  */
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'vaccination_system');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// ---- Your requested mysqli connection ----
+$connection = mysqli_connect('localhost', 'root', '', 'vaccination_system');
 
+if (!$connection) {
+    die('<div style="font-family:Arial, sans-serif; padding:40px; color:#b91c1c;">
+        <h2>Database Connection Failed</h2>
+        <p>' . htmlspecialchars(mysqli_connect_error()) . '</p>
+        <p>Make sure XAMPP\'s MySQL service is running and that the
+        <strong>vaccination_system</strong> database has been imported.</p>
+        </div>');
+}
+
+mysqli_set_charset($connection, 'utf8mb4');
+
+// ---- PDO connection (same DB, same credentials) ----
+// The rest of this project (every admin/parent/hospital page) is built on
+// PDO — $pdo->prepare(), ->execute(), ->fetch(), etc. Rather than rewrite
+// 30+ files to mysqli, this keeps $pdo working exactly as before while
+// still giving you $connection to use however you'd like.
 try {
     $pdo = new PDO(
-        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
-        DB_USER,
-        DB_PASS,
+        "mysql:host=localhost;dbname=vaccination_system;charset=utf8mb4",
+        "root",
+        "",
         [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -26,8 +38,5 @@ try {
     die('<div style="font-family:Arial, sans-serif; padding:40px; color:#b91c1c;">
         <h2>Database Connection Failed</h2>
         <p>' . htmlspecialchars($e->getMessage()) . '</p>
-        <p>Make sure XAMPP\'s MySQL service is running and that the
-        <strong>vaccination_system</strong> database has been imported
-        (see <code>vaccination_system.sql</code>).</p>
         </div>');
 }
